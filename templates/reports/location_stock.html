@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">Location Stock Report</h1>
+            <a href="{{ url_for('reports.location_stock_csv') }}" class="btn btn-outline-success">Export CSV</a>
+        </div>
+        <p class="text-muted">Current stock by product and location using the movement ledger.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if rows %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Type</th>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th class="text-end">Current Stock</th>
+                            <th class="text-end">Stock Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ row.location_name }}</td>
+                            <td>{{ row.location_type }}</td>
+                            <td>{{ row.sku }}</td>
+                            <td>{{ row.product_name }}</td>
+                            <td class="text-end">{{ row.current_stock }}</td>
+                            <td class="text-end">{{ "%.2f"|format(row.stock_value or 0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No stock records found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

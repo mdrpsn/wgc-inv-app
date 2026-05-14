@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">Supplier Purchase History</h1>
+            <a href="{{ url_for('reports.supplier_purchase_history_csv', supplier_id=selected_supplier_id, product_id=selected_product_id, date_from=date_from, date_to=date_to) }}" class="btn btn-outline-success">Export CSV</a>
+        </div>
+        <p class="text-muted">Purchase order item history by supplier, product, and date range.</p>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Filters</div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Supplier</label>
+                    <select name="supplier_id" class="form-select">
+                        <option value="">All suppliers</option>
+                        {% for supplier in suppliers %}
+                        <option value="{{ supplier.id }}" {% if selected_supplier_id|string == supplier.id|string %}selected{% endif %}>
+                            {{ supplier.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Product</label>
+                    <select name="product_id" class="form-select">
+                        <option value="">All products</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}" {% if selected_product_id|string == product.id|string %}selected{% endif %}>
+                            {{ product.sku }} - {{ product.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Date From</label>
+                    <input type="date" name="date_from" value="{{ date_from }}" class="form-control">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">Date To</label>
+                    <input type="date" name="date_to" value="{{ date_to }}" class="form-control">
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="{{ url_for('reports.supplier_purchase_history') }}" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted">Ordered Qty</div>
+                <div class="h4">{{ totals.ordered_qty }}</div>
+            </div></div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted">Received Qty</div>
+                <div class="h4">{{ totals.received_qty }}</div>
+            </div></div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted">Ordered Value</div>
+                <div class="h4">{{ "%.2f"|format(totals.ordered_total or 0) }}</div>
+            </div></div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card"><div class="card-body">
+                <div class="text-muted">Received Value</div>
+                <div class="h4">{{ "%.2f"|format(totals.received_total or 0) }}</div>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if rows %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Supplier</th>
+                            <th>Order Date</th>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th>Status</th>
+                            <th class="text-end">Ordered</th>
+                            <th class="text-end">Received</th>
+                            <th class="text-end">Unit Cost</th>
+                            <th class="text-end">Ordered Total</th>
+                            <th class="text-end">Received Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ row.po_number }}</td>
+                            <td>{{ row.supplier_name }}</td>
+                            <td>{{ row.order_date or "-" }}</td>
+                            <td>{{ row.sku }}</td>
+                            <td>{{ row.product_name }}</td>
+                            <td><span class="badge bg-secondary">{{ row.status }}</span></td>
+                            <td class="text-end">{{ row.quantity_ordered }}</td>
+                            <td class="text-end">{{ row.quantity_received }}</td>
+                            <td class="text-end">{{ "%.2f"|format(row.unit_cost or 0) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(row.ordered_total or 0) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(row.received_total or 0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No purchase history found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

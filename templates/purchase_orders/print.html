@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Purchase Order {{ po.po_number }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #111827;
+            margin: 32px;
+            font-size: 14px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #111827;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .box {
+            border: 1px solid #d1d5db;
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 8px;
+        }
+
+        th {
+            background: #f3f4f6;
+            text-align: left;
+        }
+
+        .text-end {
+            text-align: right;
+        }
+
+        .actions {
+            margin-bottom: 24px;
+        }
+
+        @media print {
+            .actions {
+                display: none;
+            }
+
+            body {
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="actions">
+        <button onclick="window.print()">Print</button>
+        <a href="{{ url_for('purchase_orders.view', po_id=po.id) }}">Back to PO</a>
+    </div>
+
+    <div class="header">
+        <div>
+            <div class="title">Purchase Order</div>
+            <div class="muted">PO Number: {{ po.po_number }}</div>
+        </div>
+
+        <div class="text-end">
+            <strong>Status:</strong> {{ po.status }}<br>
+            <strong>Order Date:</strong> {{ po.order_date or "-" }}<br>
+            <strong>Expected Date:</strong> {{ po.expected_date or "-" }}
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="box">
+            <h3>Supplier</h3>
+            <strong>{{ po.supplier_name or "-" }}</strong><br>
+            Contact: {{ po.contact_person or "-" }}<br>
+            Phone: {{ po.supplier_phone or "-" }}<br>
+            Email: {{ po.supplier_email or "-" }}<br>
+            Terms: {{ po.payment_terms or "-" }}<br>
+            Address: {{ po.supplier_address or "-" }}
+        </div>
+
+        <div class="box">
+            <h3>Notes</h3>
+            {{ po.notes or "-" }}
+        </div>
+    </div>
+
+    <h3>Items</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Product</th>
+                <th>Unit</th>
+                <th class="text-end">Ordered</th>
+                <th class="text-end">Received</th>
+                <th class="text-end">Unit Cost</th>
+                <th class="text-end">Line Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.sku }}</td>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.unit or "-" }}</td>
+                <td class="text-end">{{ item.quantity_ordered }}</td>
+                <td class="text-end">{{ item.quantity_received }}</td>
+                <td class="text-end">{{ "%.2f"|format(item.unit_cost or 0) }}</td>
+                <td class="text-end">{{ "%.2f"|format((item.quantity_ordered or 0) * (item.unit_cost or 0)) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="6" class="text-end">Ordered Total</th>
+                <th class="text-end">{{ "%.2f"|format(totals.ordered_total or 0) }}</th>
+            </tr>
+            <tr>
+                <th colspan="6" class="text-end">Received Total</th>
+                <th class="text-end">{{ "%.2f"|format(totals.received_total or 0) }}</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <br><br>
+
+    <div class="grid">
+        <div>
+            Prepared by:<br><br>
+            ___________________________
+        </div>
+
+        <div>
+            Approved by:<br><br>
+            ___________________________
+        </div>
+    </div>
+</body>
+</html>

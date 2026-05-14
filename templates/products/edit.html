@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h1 class="h3">Edit Product</h1>
+            <p class="text-muted mb-0">{{ product.sku }} - {{ product.name }}</p>
+        </div>
+
+        {% if product.is_active %}
+        <span class="badge bg-success fs-6">Active</span>
+        {% else %}
+        <span class="badge bg-danger fs-6">Inactive</span>
+        {% endif %}
+    </div>
+
+    {% if blocks %}
+    <div class="alert alert-warning">
+        <strong>Deactivate blocked:</strong>
+        <ul class="mb-0">
+            {% for block in blocks %}
+            <li>{{ block }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">SKU</label>
+                        <input type="text" name="sku" class="form-control" value="{{ product.sku }}" required>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Category</label>
+                        <input type="text" name="category" class="form-control" value="{{ product.category or '' }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Unit</label>
+                        <input type="text" name="unit" class="form-control" value="{{ product.unit or 'pcs' }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Cost Price</label>
+                        <input type="number" name="cost_price" class="form-control" min="0" step="0.01" value="{{ product.cost_price or 0 }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Selling Price</label>
+                        <input type="number" name="selling_price" class="form-control" min="0" step="0.01" value="{{ product.selling_price or 0 }}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Reorder Level</label>
+                        <input type="number" name="reorder_level" class="form-control" min="0" value="{{ product.reorder_level or 0 }}">
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-danger">
+        <div class="card-header text-danger">Lifecycle Control</div>
+        <div class="card-body">
+            {% if product.is_active %}
+            <form method="post" action="{{ url_for('products.deactivate', product_id=product.id) }}">
+                <button type="submit" class="btn btn-danger" {% if blocks %}disabled{% endif %}>
+                    Deactivate Product
+                </button>
+            </form>
+            {% else %}
+            <form method="post" action="{{ url_for('products.reactivate', product_id=product.id) }}">
+                <button type="submit" class="btn btn-success">Reactivate Product</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

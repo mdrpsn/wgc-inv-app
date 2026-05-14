@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <h1 class="h3">Receive Transfer {{ transfer.transfer_number }}</h1>
+        <p class="text-muted">{{ transfer.from_location }} to {{ transfer.to_location }}</p>
+    </div>
+
+    <form method="post">
+        <div class="card mb-3">
+            <div class="card-header">Receive Items</div>
+            <div class="card-body">
+                {% if items %}
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Product</th>
+                                <th class="text-end">Transferred</th>
+                                <th class="text-end">Already Received</th>
+                                <th class="text-end">Remaining</th>
+                                <th class="text-end">Receive Now</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.sku }}</td>
+                                <td>{{ item.product_name }}</td>
+                                <td class="text-end">{{ item.quantity_transferred }}</td>
+                                <td class="text-end">{{ item.quantity_received }}</td>
+                                <td class="text-end">{{ item.remaining_qty }}</td>
+                                <td>
+                                    <input type="number" name="received_qty_{{ item.id }}" class="form-control text-end" min="0" max="{{ item.remaining_qty }}" value="{{ item.remaining_qty }}">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No items to receive.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Post Receiving</button>
+            <a href="{{ url_for('stock_transfers.view', transfer_id=transfer.id) }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

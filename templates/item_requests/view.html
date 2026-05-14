@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h1 class="h3">Item Request {{ item_request.request_number }}</h1>
+            <p class="text-muted mb-0">{{ item_request.from_location }} to {{ item_request.to_location }}</p>
+        </div>
+
+        <span class="badge bg-secondary fs-6">{{ item_request.status }}</span>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">Request Details</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong>Needed Date</strong>
+                    <div>{{ item_request.needed_date or "-" }}</div>
+                </div>
+                <div class="col-md-3">
+                    <strong>Request Date</strong>
+                    <div>{{ item_request.request_date }}</div>
+                </div>
+                <div class="col-md-6">
+                    <strong>Notes</strong>
+                    <div>{{ item_request.notes or "-" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" action="{{ url_for('item_requests.approve', request_id=item_request.id) }}">
+        <div class="card mb-3">
+            <div class="card-header">Items</div>
+            <div class="card-body">
+                {% if items %}
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Product</th>
+                                <th class="text-end">Requested</th>
+                                <th class="text-end">Approved</th>
+                                <th class="text-end">Fulfilled</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.sku }}</td>
+                                <td>{{ item.product_name }}</td>
+                                <td class="text-end">{{ item.quantity_requested }}</td>
+                                <td class="text-end">
+                                    {% if item_request.status == "submitted" %}
+                                    <input type="number" name="approved_qty_{{ item.id }}" class="form-control text-end" min="0" max="{{ item.quantity_requested }}" value="{{ item.quantity_requested }}">
+                                    {% else %}
+                                    {{ item.quantity_approved }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">{{ item.quantity_fulfilled }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No items found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('item_requests.index') }}" class="btn btn-outline-secondary">Back</a>
+
+            {% if item_request.status == "draft" %}
+            <button formaction="{{ url_for('item_requests.submit', request_id=item_request.id) }}" formmethod="post" class="btn btn-primary">Submit Request</button>
+            {% endif %}
+
+            {% if item_request.status == "submitted" %}
+            <button type="submit" class="btn btn-success">Approve Request</button>
+            <button formaction="{{ url_for('item_requests.reject', request_id=item_request.id) }}" formmethod="post" class="btn btn-danger">Reject Request</button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

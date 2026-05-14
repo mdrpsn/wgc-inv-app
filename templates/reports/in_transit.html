@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">In-Transit Stock Report</h1>
+            <a href="{{ url_for('reports.in_transit_csv') }}" class="btn btn-outline-success">Export CSV</a>
+        </div>
+        <p class="text-muted">Stock deducted from source location but not fully received by destination.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if rows %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Transfer No.</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th class="text-end">Transferred</th>
+                            <th class="text-end">Received</th>
+                            <th class="text-end">In Transit</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr>
+                            <td>{{ row.transfer_number }}</td>
+                            <td>{{ row.from_location }}</td>
+                            <td>{{ row.to_location }}</td>
+                            <td>{{ row.sku }}</td>
+                            <td>{{ row.product_name }}</td>
+                            <td class="text-end">{{ row.quantity_transferred }}</td>
+                            <td class="text-end">{{ row.quantity_received }}</td>
+                            <td class="text-end">{{ row.in_transit_qty }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ row.status }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No in-transit stock found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

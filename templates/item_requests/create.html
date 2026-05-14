@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <h1 class="h3">New Item Request</h1>
+        <p class="text-muted">Use this when a branch requests items from a warehouse or another location.</p>
+    </div>
+
+    <form method="post">
+        <div class="card mb-3">
+            <div class="card-header">Request Details</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Request Number</label>
+                        <input type="text" name="request_number" class="form-control" placeholder="REQ-0001" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">From Location</label>
+                        <select name="from_location_id" class="form-select" required>
+                            <option value="">Select location</option>
+                            {% for location in locations %}
+                            <option value="{{ location.id }}">{{ location.name }} - {{ location.location_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">To Location</label>
+                        <select name="to_location_id" class="form-select" required>
+                            <option value="">Select location</option>
+                            {% for location in locations %}
+                            <option value="{{ location.id }}">{{ location.name }} - {{ location.location_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Needed Date</label>
+                        <input type="date" name="needed_date" class="form-control">
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label">Notes</label>
+                        <input type="text" name="notes" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Request Items</div>
+            <div class="card-body">
+                <div id="items-container">
+                    <div class="row g-2 mb-2 item-row">
+                        <div class="col-md-8">
+                            <select name="product_id[]" class="form-select" required>
+                                <option value="">Select product</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.sku }} - {{ product.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <input type="number" name="quantity[]" class="form-control" min="1" placeholder="Qty" required>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-outline-danger w-100" onclick="removeRow(this)">X</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addItemRow()">Add Item</button>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Create Request</button>
+            <a href="{{ url_for('item_requests.index') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function addItemRow() {
+    const container = document.getElementById("items-container");
+    const row = container.querySelector(".item-row").cloneNode(true);
+
+    row.querySelectorAll("select, input").forEach(function (input) {
+        input.value = "";
+    });
+
+    container.appendChild(row);
+}
+
+function removeRow(button) {
+    const rows = document.querySelectorAll(".item-row");
+
+    if (rows.length > 1) {
+        button.closest(".item-row").remove();
+    }
+}
+</script>
+{% endblock %}

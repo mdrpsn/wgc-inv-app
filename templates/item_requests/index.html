@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3">Item Requests</h1>
+        <a href="{{ url_for('item_requests.create') }}" class="btn btn-primary">New Request</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if requests %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Request No.</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Needed Date</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr>
+                            <td>{{ req.request_number }}</td>
+                            <td>{{ req.from_location }}</td>
+                            <td>{{ req.to_location }}</td>
+                            <td>{{ req.needed_date or "-" }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ req.status }}</span>
+                            </td>
+                            <td>{{ req.created_at }}</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('item_requests.view', request_id=req.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No item requests found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

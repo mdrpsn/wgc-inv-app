@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.env/
+.env
+.venv/
+
+# Flask
+instance/
+.webassets-cache
+
+# SQLite runtime database
+*.db
+*.sqlite
+*.sqlite3
+
+# Local/temp files
+_flask_route_smoke_test.py
+*.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/

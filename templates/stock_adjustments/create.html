@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <h1 class="h3">Starting Stock Adjustment</h1>
+        <p class="text-muted">Seed stock into a specific location through the movement ledger.</p>
+    </div>
+
+    {% if not products or not locations %}
+    <div class="alert alert-warning">
+        You need at least one active product and one active location before posting starting stock.
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label">Product</label>
+                        <select name="product_id" class="form-select" required>
+                            <option value="">Select product</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.sku }} - {{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Location</label>
+                        <select name="location_id" class="form-select" required>
+                            <option value="">Select location</option>
+                            {% for location in locations %}
+                            <option value="{{ location.id }}">{{ location.name }} - {{ location.location_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" name="quantity" class="form-control" min="1" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Unit Cost</label>
+                        <input type="number" name="unit_cost" class="form-control" min="0" step="0.01" value="0">
+                    </div>
+
+                    <div class="col-md-9">
+                        <label class="form-label">Reason</label>
+                        <input type="text" name="reason" class="form-control" value="Starting stock adjustment">
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary" {% if not products or not locations %}disabled{% endif %}>
+                        Post Starting Stock
+                    </button>
+                    <a href="{{ url_for('reports.location_stock') }}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

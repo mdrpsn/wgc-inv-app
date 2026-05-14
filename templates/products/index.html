@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3">Products</h1>
+            <p class="text-muted mb-0">Product master list.</p>
+        </div>
+        <a href="{{ url_for('products.create') }}" class="btn btn-primary">New Product</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if products %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Unit</th>
+                            <th class="text-end">Cost</th>
+                            <th class="text-end">Selling</th>
+                            <th class="text-end">Reorder Level</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.sku }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.category or "-" }}</td>
+                            <td>{{ product.unit or "-" }}</td>
+                            <td class="text-end">{{ "%.2f"|format(product.cost_price or 0) }}</td>
+                            <td class="text-end">{{ "%.2f"|format(product.selling_price or 0) }}</td>
+                            <td class="text-end">{{ product.reorder_level or 0 }}</td>
+                            <td>{% if product.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-danger">Inactive</span>{% endif %}</td>
+                            <td class="text-end"><a href="{{ url_for('products.edit', product_id=product.id) }}" class="btn btn-sm btn-outline-primary">Edit</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No products found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <h1 class="h3">Receive Purchase Order {{ po.po_number }}</h1>
+        <p class="text-muted">Receive supplier items into a warehouse location.</p>
+    </div>
+
+    {% if not warehouses %}
+    <div class="alert alert-warning">
+        You need at least one active warehouse location before receiving purchase orders.
+    </div>
+    {% endif %}
+
+    <form method="post">
+        <div class="card mb-3">
+            <div class="card-header">Receiving Location</div>
+            <div class="card-body">
+                <label class="form-label">Warehouse</label>
+                <select name="warehouse_location_id" class="form-select" required>
+                    <option value="">Select warehouse</option>
+                    {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Receive Items</div>
+            <div class="card-body">
+                {% if items %}
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Product</th>
+                                <th class="text-end">Ordered</th>
+                                <th class="text-end">Already Received</th>
+                                <th class="text-end">Remaining</th>
+                                <th class="text-end">Receive Now</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            {% if item.remaining_qty > 0 %}
+                            <tr>
+                                <td>{{ item.sku }}</td>
+                                <td>{{ item.product_name }}</td>
+                                <td class="text-end">{{ item.quantity_ordered }}</td>
+                                <td class="text-end">{{ item.quantity_received }}</td>
+                                <td class="text-end">{{ item.remaining_qty }}</td>
+                                <td>
+                                    <input type="number" name="received_qty_{{ item.id }}" class="form-control text-end" min="0" max="{{ item.remaining_qty }}" value="{{ item.remaining_qty }}">
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No items to receive.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" {% if not warehouses %}disabled{% endif %}>
+                Post Receiving
+            </button>
+            <a href="{{ url_for('purchase_orders.view', po_id=po.id) }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

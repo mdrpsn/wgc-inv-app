@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3">Suppliers</h1>
+            <p class="text-muted mb-0">Supplier master list.</p>
+        </div>
+        <a href="{{ url_for('suppliers.create') }}" class="btn btn-primary">New Supplier</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if suppliers %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact Person</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Terms</th>
+                            <th class="text-end">Lead Time</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for supplier in suppliers %}
+                        <tr>
+                            <td>{{ supplier.name }}</td>
+                            <td>{{ supplier.contact_person or "-" }}</td>
+                            <td>{{ supplier.phone or "-" }}</td>
+                            <td>{{ supplier.email or "-" }}</td>
+                            <td>{{ supplier.payment_terms or "-" }}</td>
+                            <td class="text-end">{{ supplier.lead_time_days or 0 }} days</td>
+                            <td>{% if supplier.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-danger">Inactive</span>{% endif %}</td>
+                            <td class="text-end"><a href="{{ url_for('suppliers.edit', supplier_id=supplier.id) }}" class="btn btn-sm btn-outline-primary">Edit</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No suppliers found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
